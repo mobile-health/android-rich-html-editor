@@ -56,6 +56,9 @@ internal class JsBridge(
     private var _isEmptyFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     var isEmptyFlow: StateFlow<Boolean?> = _isEmptyFlow.asStateFlow()
 
+    private var _contentChangedFlow: MutableSharedFlow<String> = MutableSharedFlow()
+    var contentChangedFlow = _contentChangedFlow.asSharedFlow()
+
     fun toggleBold() = execCommand(StatusCommand.BOLD)
 
     fun toggleItalic() = execCommand(StatusCommand.ITALIC)
@@ -97,6 +100,13 @@ internal class JsBridge(
     }
 
     fun unlink() = jsExecutor.executeImmediatelyAndRefreshToolbar(JsExecutableMethod("unlink"))
+
+    fun setContentEditable(editable: Boolean) = jsExecutor.executeWhenDomIsLoaded(
+        JsExecutableMethod(
+            "setContentEditable",
+            if (editable) "true" else "false"
+        )
+    )
 
     private fun execCommand(command: ExecCommand, argument: Any? = null) {
         jsExecutor.executeImmediatelyAndRefreshToolbar(
@@ -187,6 +197,13 @@ internal class JsBridge(
     fun onEmptyBodyChanges(isBodyEmpty: Boolean) {
         coroutineScope.launch(defaultDispatcher) {
             _isEmptyFlow.emit(isBodyEmpty)
+        }
+    }
+
+    @JavascriptInterface
+    fun onContentChange(html: String) {
+        coroutineScope.launch(defaultDispatcher) {
+            _contentChangedFlow.emit(html)
         }
     }
 

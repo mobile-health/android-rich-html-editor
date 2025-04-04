@@ -12,3 +12,6 @@ reportEmptyBodyStatus()
 onEditorChildListChange(() => {
     reportEmptyBodyStatus()
 })
+onEditorCharacterDataChange(() => {
+    reportContentChange()
+})

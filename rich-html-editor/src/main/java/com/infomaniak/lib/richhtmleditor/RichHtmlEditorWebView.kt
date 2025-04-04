@@ -125,6 +125,8 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
      */
     val isEmptyFlow: StateFlow<Boolean?> by jsBridge::isEmptyFlow
 
+    val onContentChangeFlow: SharedFlow<String> by jsBridge::contentChangedFlow
+
     private var htmlExportCallback: MutableList<((html: String) -> Unit)> = mutableListOf()
 
     private val htmlExportMutex = Mutex()
@@ -221,6 +223,7 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
     fun redo() = jsBridge.redo()
     fun createLink(displayText: String?, url: String) = jsBridge.createLink(displayText?.takeIf { it.isNotBlank() }, url)
     fun unlink() = jsBridge.unlink()
+    fun setContentEditable(editable: Boolean) = jsBridge.setContentEditable(editable)
 
     /**
      * Notifies the [RichHtmlEditorWebView] to setup the editor.
