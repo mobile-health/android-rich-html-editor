@@ -143,9 +143,12 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
         addJavascriptInterface(jsBridge, "editor")
 
         stateSubscriber.executeWhenDomIsLoaded(null)
+    }
 
-        val template = context.readAsset("editor_template.html")
-        super.loadDataWithBaseURL("https://cms-file-teleconsult-3466.test.manadrdev.com", template, "text/html", "UTF-8", null)
+    private val template by lazy { context.readAsset("editor_template.html") }
+
+    fun initEditor(baseUrl: String?) {
+        super.loadDataWithBaseURL(baseUrl, template, "text/html", "UTF-8", null)
     }
 
     /**

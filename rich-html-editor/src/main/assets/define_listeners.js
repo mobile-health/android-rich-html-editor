@@ -29,7 +29,7 @@ function onEditorChildListChange(callback) {
 }
 
 function onEditorCharacterDataChange(callback) {
-    const config = { characterData: true, subtree: true }
+    const config = { characterData: true, subtree: true, childList: true }
     const observer = new MutationObserver(callback)
     observer.observe(getEditor(), config)
 }

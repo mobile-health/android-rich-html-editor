@@ -96,7 +96,13 @@ internal class JsBridge(
     fun redo() = execCommand(OtherCommand.REDO)
 
     fun createLink(displayText: String?, url: String) {
-        jsExecutor.executeImmediatelyAndRefreshToolbar(JsExecutableMethod("createLink", displayText, url))
+        jsExecutor.executeImmediatelyAndRefreshToolbar(
+            JsExecutableMethod(
+                "createLink",
+                displayText,
+                url
+            )
+        )
     }
 
     fun unlink() = jsExecutor.executeImmediatelyAndRefreshToolbar(JsExecutableMethod("unlink"))
