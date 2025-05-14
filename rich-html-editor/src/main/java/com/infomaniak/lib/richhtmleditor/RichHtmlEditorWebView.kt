@@ -145,7 +145,7 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
         stateSubscriber.executeWhenDomIsLoaded(null)
 
         val template = context.readAsset("editor_template.html")
-        super.loadDataWithBaseURL("", template, "text/html", "UTF-8", null)
+        super.loadDataWithBaseURL("https://cms-file-teleconsult-3466.test.manadrdev.com", template, "text/html", "UTF-8", null)
     }
 
     /**

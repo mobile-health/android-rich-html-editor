@@ -12,6 +12,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    api(project(":logger"))
 }
 
 kotlin { autoConfig() }

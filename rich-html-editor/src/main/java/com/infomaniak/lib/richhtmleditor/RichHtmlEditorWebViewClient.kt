@@ -17,8 +17,14 @@
  */
 package com.infomaniak.lib.richhtmleditor
 
+import android.net.http.SslError
+import android.webkit.SslErrorHandler
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.mhealth.logger.AppLogger
 
 
 /**
@@ -28,4 +34,27 @@ import android.webkit.WebViewClient
  */
 class RichHtmlEditorWebViewClient(private val onPageLoaded: () -> Unit) : WebViewClient() {
     override fun onPageFinished(webView: WebView, url: String?) = onPageLoaded()
+
+    override fun onReceivedError(
+        view: WebView?,
+        request: WebResourceRequest?,
+        error: WebResourceError?
+    ) {
+        AppLogger.error("{}", error)
+        super.onReceivedError(view, request, error)
+    }
+
+    override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
+        AppLogger.error("{}", error)
+        super.onReceivedSslError(view, handler, error)
+    }
+
+    override fun onReceivedHttpError(
+        view: WebView?,
+        request: WebResourceRequest?,
+        errorResponse: WebResourceResponse?
+    ) {
+        AppLogger.error("{}", errorResponse)
+        super.onReceivedHttpError(view, request, errorResponse)
+    }
 }
