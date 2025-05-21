@@ -1,17 +1,14 @@
 onBodyResize(() => {
     updateWebViewHeightWithBodyHeight()
-    focusCursorOnScreen()
+    setTimeout(() => { focusCursorOnScreen() }, 100)
 })
 
 document.addEventListener("selectionchange", () => {
     reportSelectionStateChangedIfNecessary()
-    focusCursorOnScreen()
+    setTimeout(() => { focusCursorOnScreen() }, 300)
 })
 
 reportEmptyBodyStatus()
-onEditorChildListChange(() => {
-    reportEmptyBodyStatus()
-})
 onEditorCharacterDataChange(() => {
     reportContentChange()
 })

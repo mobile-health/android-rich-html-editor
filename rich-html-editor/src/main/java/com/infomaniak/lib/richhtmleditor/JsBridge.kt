@@ -18,6 +18,7 @@
 package com.infomaniak.lib.richhtmleditor
 
 import android.graphics.Color
+import android.graphics.Rect
 import android.webkit.JavascriptInterface
 import androidx.annotation.ColorInt
 import androidx.annotation.IntRange
@@ -58,6 +59,9 @@ internal class JsBridge(
 
     private var _contentChangedFlow: MutableSharedFlow<String> = MutableSharedFlow()
     var contentChangedFlow = _contentChangedFlow.asSharedFlow()
+
+    private var _rect: MutableSharedFlow<Rect> = MutableSharedFlow()
+    var rectFlow = _rect.asSharedFlow()
 
     fun toggleBold() = execCommand(StatusCommand.BOLD)
 
@@ -130,7 +134,8 @@ internal class JsBridge(
     fun String.toColorIntOrNull(): Int? {
         if (!startsWith("rgb")) return null
 
-        val (r, g, b) = filterNot { it in CHARACTERS_TO_REMOVE }.split(",").takeIf { it.size == 3 || it.size == 4 } ?: return null
+        val (r, g, b) = filterNot { it in CHARACTERS_TO_REMOVE }.split(",")
+            .takeIf { it.size == 3 || it.size == 4 } ?: return null
 
         return Color.argb(255, r.toInt(), g.toInt(), b.toInt())
     }
@@ -193,7 +198,10 @@ internal class JsBridge(
 
     @JavascriptInterface
     fun focusCursorOnScreen(left: Int, top: Int, right: Int, bottom: Int) {
-        requestRectangleOnScreen(left, top, right, bottom)
+//        requestRectangleOnScreen(left, top, right, bottom)
+        coroutineScope.launch(defaultDispatcher) {
+            _rect.emit(Rect(left, top, right, bottom))
+        }
     }
 
     @JavascriptInterface

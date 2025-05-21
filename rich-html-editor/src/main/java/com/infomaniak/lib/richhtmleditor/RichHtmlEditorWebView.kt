@@ -127,6 +127,8 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
 
     val onContentChangeFlow: SharedFlow<String> by jsBridge::contentChangedFlow
 
+    val rectFlow: SharedFlow<Rect> by jsBridge::rectFlow
+
     private var htmlExportCallback: MutableList<((html: String) -> Unit)> = mutableListOf()
 
     private val htmlExportMutex = Mutex()
