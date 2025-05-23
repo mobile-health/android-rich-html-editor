@@ -157,3 +157,9 @@ function reportEmptyBodyStatus() {
 function reportContentChange() {
     window.editor.onContentChange(getEditor().innerHTML)
 }
+
+function reportImageClicked(imgSrc) {
+    unFocus()
+
+    window.editor.onImageClicked(imgSrc)
+}

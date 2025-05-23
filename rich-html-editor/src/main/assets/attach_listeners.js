@@ -8,6 +8,14 @@ document.addEventListener("selectionchange", () => {
     setTimeout(() => { focusCursorOnScreen() }, 300)
 })
 
+document.addEventListener("click", () => {
+    if (event.target.tagName === 'IMG') {
+        const imgSrc = event.target.src;
+
+        reportImageClicked(imgSrc)
+    }
+})
+
 reportEmptyBodyStatus()
 onEditorCharacterDataChange(() => {
     reportContentChange()

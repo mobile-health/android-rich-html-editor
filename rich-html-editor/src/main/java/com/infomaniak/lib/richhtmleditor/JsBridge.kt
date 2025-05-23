@@ -63,6 +63,9 @@ internal class JsBridge(
     private var _rect: MutableSharedFlow<Rect> = MutableSharedFlow()
     var rectFlow = _rect.asSharedFlow()
 
+    private var _imageClickFlow: MutableSharedFlow<String> = MutableSharedFlow()
+    var imageClickFlow = _imageClickFlow.asSharedFlow()
+
     fun toggleBold() = execCommand(StatusCommand.BOLD)
 
     fun toggleItalic() = execCommand(StatusCommand.ITALIC)
@@ -218,6 +221,13 @@ internal class JsBridge(
     fun onContentChange(html: String) {
         coroutineScope.launch(defaultDispatcher) {
             _contentChangedFlow.emit(html)
+        }
+    }
+
+    @JavascriptInterface
+    fun onImageClicked(src: String) {
+        coroutineScope.launch(defaultDispatcher) {
+            _imageClickFlow.emit(src)
         }
     }
 

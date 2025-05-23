@@ -128,6 +128,7 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
     val onContentChangeFlow: SharedFlow<String> by jsBridge::contentChangedFlow
 
     val rectFlow: SharedFlow<Rect> by jsBridge::rectFlow
+    val imageClickedFlow: SharedFlow<String> by jsBridge::imageClickFlow
 
     private var htmlExportCallback: MutableList<((html: String) -> Unit)> = mutableListOf()
 
@@ -277,15 +278,15 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
         super.onRestoreInstanceState(state?.getParcelableCompat(SUPER_STATE_KEY, AbsSavedState::class.java))
     }
 
-    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-        super.onFocusChanged(focused, direction, previouslyFocusedRect)
-        if (focused) {
-            jsExecutor.executeWhenDomIsLoaded(JsExecutableMethod("requestFocus"))
-            if (keepKeyboardOpenedOnConfigurationChanged) keyboardOpener.executeWhenDomIsLoaded(Unit)
-        } else {
-            keepKeyboardOpenedOnConfigurationChanged = false
-        }
-    }
+//    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+//        super.onFocusChanged(focused, direction, previouslyFocusedRect)
+//        if (focused) {
+//            jsExecutor.executeWhenDomIsLoaded(JsExecutableMethod("requestFocus"))
+//            if (keepKeyboardOpenedOnConfigurationChanged) keyboardOpener.executeWhenDomIsLoaded(Unit)
+//        } else {
+//            keepKeyboardOpenedOnConfigurationChanged = false
+//        }
+//    }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
