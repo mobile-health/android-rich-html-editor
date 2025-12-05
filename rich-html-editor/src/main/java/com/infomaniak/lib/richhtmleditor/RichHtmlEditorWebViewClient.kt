@@ -25,6 +25,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.mhealth.logger.AppLogger
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 /**
@@ -40,7 +41,7 @@ class RichHtmlEditorWebViewClient(private val onPageLoaded: () -> Unit) : WebVie
         request: WebResourceRequest?,
         error: WebResourceError?
     ) {
-        AppLogger.error("{}", error)
+        AppLogger.error("errorCode: {}\ndescription: {}", error?.errorCode, error?.description)
         super.onReceivedError(view, request, error)
     }
 
@@ -49,12 +50,18 @@ class RichHtmlEditorWebViewClient(private val onPageLoaded: () -> Unit) : WebVie
         super.onReceivedSslError(view, handler, error)
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     override fun onReceivedHttpError(
         view: WebView?,
         request: WebResourceRequest?,
         errorResponse: WebResourceResponse?
     ) {
-        AppLogger.error("{}", errorResponse)
+        AppLogger.error(
+            "status:{}\nresponseHeaders:{}\ndata:{}",
+            errorResponse?.statusCode,
+            errorResponse?.responseHeaders.toString(),
+            errorResponse?.data?.readBytes()?.decodeToString()
+        )
         super.onReceivedHttpError(view, request, errorResponse)
     }
 }
