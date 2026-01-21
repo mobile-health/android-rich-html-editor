@@ -49,6 +49,7 @@ internal class JsBridge(
     private val editorStatuses = EditorStatuses()
 
     private val _editorStatusesFlow = MutableSharedFlow<EditorStatuses>(
+        replay = 1,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
