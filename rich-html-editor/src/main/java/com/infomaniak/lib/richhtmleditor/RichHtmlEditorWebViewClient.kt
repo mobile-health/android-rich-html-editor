@@ -27,7 +27,6 @@ import android.webkit.WebViewClient
 import com.mhealth.logger.AppLogger
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-
 /**
  * A custom [WebViewClient] used to notify the [RichHtmlEditorWebView] editor of when the template has finished loading.
  * [RichHtmlEditorWebView.notifyPageHasLoaded] needs to be called inside [WebViewClient.onPageFinished] so the editor can work

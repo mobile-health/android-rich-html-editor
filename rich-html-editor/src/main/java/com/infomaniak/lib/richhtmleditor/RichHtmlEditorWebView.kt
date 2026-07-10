@@ -170,7 +170,6 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
      */
     fun subscribeToStates(subscribedStates: Set<StatusCommand>?) = stateSubscriber.executeWhenDomIsLoaded(subscribedStates)
 
-
     /**
      * Injects a custom CSS tag into the `<head>` of the editor template.
      *
