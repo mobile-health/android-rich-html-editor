@@ -28,10 +28,20 @@ function onEditorChildListChange(callback) {
     observer.observe(getEditor(), config)
 }
 
+function onEditorCharacterDataChange(callback) {
+    const config = { characterData: true, subtree: true, childList: true }
+    const observer = new MutationObserver(callback)
+    observer.observe(getEditor(), config)
+}
+
 // Core logic
 
 function exportHtml() {
     window.editor.exportHtml(getEditor().innerHTML)
+}
+
+function setContentEditable(editable) {
+    getEditor().contentEditable = editable
 }
 
 function focusCursorOnScreen() {
@@ -142,4 +152,14 @@ function reportEmptyBodyStatus() {
     if (previousEmptyStat === isEditorEmpty) return
     previousEmptyStat = isEditorEmpty
     window.editor.onEmptyBodyChanges(isEditorEmpty)
+}
+
+function reportContentChange() {
+    window.editor.onContentChange(getEditor().innerHTML)
+}
+
+function reportImageClicked(imgSrc) {
+    unFocus()
+
+    window.editor.onImageClicked(imgSrc)
 }

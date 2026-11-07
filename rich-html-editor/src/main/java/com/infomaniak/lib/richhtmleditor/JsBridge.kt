@@ -18,6 +18,7 @@
 package com.infomaniak.lib.richhtmleditor
 
 import android.graphics.Color
+import android.graphics.Rect
 import android.webkit.JavascriptInterface
 import androidx.annotation.ColorInt
 import androidx.annotation.IntRange
@@ -48,6 +49,7 @@ internal class JsBridge(
     private val editorStatuses = EditorStatuses()
 
     private val _editorStatusesFlow = MutableSharedFlow<EditorStatuses>(
+        replay = 1,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
@@ -55,6 +57,15 @@ internal class JsBridge(
 
     private var _isEmptyFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     var isEmptyFlow: StateFlow<Boolean?> = _isEmptyFlow.asStateFlow()
+
+    private var _contentChangedFlow: MutableSharedFlow<String> = MutableSharedFlow()
+    var contentChangedFlow = _contentChangedFlow.asSharedFlow()
+
+    private var _rect: MutableSharedFlow<Rect> = MutableSharedFlow()
+    var rectFlow = _rect.asSharedFlow()
+
+    private var _imageClickFlow: MutableSharedFlow<String> = MutableSharedFlow()
+    var imageClickFlow = _imageClickFlow.asSharedFlow()
 
     fun toggleBold() = execCommand(StatusCommand.BOLD)
 
@@ -93,10 +104,23 @@ internal class JsBridge(
     fun redo() = execCommand(OtherCommand.REDO)
 
     fun createLink(displayText: String?, url: String) {
-        jsExecutor.executeImmediatelyAndRefreshToolbar(JsExecutableMethod("createLink", displayText, url))
+        jsExecutor.executeImmediatelyAndRefreshToolbar(
+            JsExecutableMethod(
+                "createLink",
+                displayText,
+                url
+            )
+        )
     }
 
     fun unlink() = jsExecutor.executeImmediatelyAndRefreshToolbar(JsExecutableMethod("unlink"))
+
+    fun setContentEditable(editable: Boolean) = jsExecutor.executeWhenDomIsLoaded(
+        JsExecutableMethod(
+            "setContentEditable",
+            if (editable) "true" else "false"
+        )
+    )
 
     private fun execCommand(command: ExecCommand, argument: Any? = null) {
         jsExecutor.executeImmediatelyAndRefreshToolbar(
@@ -114,7 +138,8 @@ internal class JsBridge(
     fun String.toColorIntOrNull(): Int? {
         if (!startsWith("rgb")) return null
 
-        val (r, g, b) = filterNot { it in CHARACTERS_TO_REMOVE }.split(",").takeIf { it.size == 3 || it.size == 4 } ?: return null
+        val (r, g, b) = filterNot { it in CHARACTERS_TO_REMOVE }.split(",")
+            .takeIf { it.size == 3 || it.size == 4 } ?: return null
 
         return Color.argb(255, r.toInt(), g.toInt(), b.toInt())
     }
@@ -177,7 +202,10 @@ internal class JsBridge(
 
     @JavascriptInterface
     fun focusCursorOnScreen(left: Int, top: Int, right: Int, bottom: Int) {
-        requestRectangleOnScreen(left, top, right, bottom)
+//        requestRectangleOnScreen(left, top, right, bottom)
+        coroutineScope.launch(defaultDispatcher) {
+            _rect.emit(Rect(left, top, right, bottom))
+        }
     }
 
     @JavascriptInterface
@@ -187,6 +215,20 @@ internal class JsBridge(
     fun onEmptyBodyChanges(isBodyEmpty: Boolean) {
         coroutineScope.launch(defaultDispatcher) {
             _isEmptyFlow.emit(isBodyEmpty)
+        }
+    }
+
+    @JavascriptInterface
+    fun onContentChange(html: String) {
+        coroutineScope.launch(defaultDispatcher) {
+            _contentChangedFlow.emit(html)
+        }
+    }
+
+    @JavascriptInterface
+    fun onImageClicked(src: String) {
+        coroutineScope.launch(defaultDispatcher) {
+            _imageClickFlow.emit(src)
         }
     }
 

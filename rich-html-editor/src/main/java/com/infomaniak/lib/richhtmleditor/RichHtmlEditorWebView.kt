@@ -125,6 +125,11 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
      */
     val isEmptyFlow: StateFlow<Boolean?> by jsBridge::isEmptyFlow
 
+    val onContentChangeFlow: SharedFlow<String> by jsBridge::contentChangedFlow
+
+    val rectFlow: SharedFlow<Rect> by jsBridge::rectFlow
+    val imageClickedFlow: SharedFlow<String> by jsBridge::imageClickFlow
+
     private var htmlExportCallback: MutableList<((html: String) -> Unit)> = mutableListOf()
 
     private val htmlExportMutex = Mutex()
@@ -141,9 +146,12 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
         addJavascriptInterface(jsBridge, "editor")
 
         stateSubscriber.executeWhenDomIsLoaded(null)
+    }
 
-        val template = context.readAsset("editor_template.html")
-        super.loadDataWithBaseURL("", template, "text/html", "UTF-8", null)
+    private val template by lazy { context.readAsset("editor_template.html") }
+
+    fun initEditor(baseUrl: String?) {
+        super.loadDataWithBaseURL(baseUrl, template, "text/html", "UTF-8", null)
     }
 
     /**
@@ -161,7 +169,6 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
      * subscribed to.
      */
     fun subscribeToStates(subscribedStates: Set<StatusCommand>?) = stateSubscriber.executeWhenDomIsLoaded(subscribedStates)
-
 
     /**
      * Injects a custom CSS tag into the `<head>` of the editor template.
@@ -221,6 +228,7 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
     fun redo() = jsBridge.redo()
     fun createLink(displayText: String?, url: String) = jsBridge.createLink(displayText?.takeIf { it.isNotBlank() }, url)
     fun unlink() = jsBridge.unlink()
+    fun setContentEditable(editable: Boolean) = jsBridge.setContentEditable(editable)
 
     /**
      * Notifies the [RichHtmlEditorWebView] to setup the editor.
@@ -269,15 +277,15 @@ class RichHtmlEditorWebView @JvmOverloads constructor(
         super.onRestoreInstanceState(state?.getParcelableCompat(SUPER_STATE_KEY, AbsSavedState::class.java))
     }
 
-    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-        super.onFocusChanged(focused, direction, previouslyFocusedRect)
-        if (focused) {
-            jsExecutor.executeWhenDomIsLoaded(JsExecutableMethod("requestFocus"))
-            if (keepKeyboardOpenedOnConfigurationChanged) keyboardOpener.executeWhenDomIsLoaded(Unit)
-        } else {
-            keepKeyboardOpenedOnConfigurationChanged = false
-        }
-    }
+//    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+//        super.onFocusChanged(focused, direction, previouslyFocusedRect)
+//        if (focused) {
+//            jsExecutor.executeWhenDomIsLoaded(JsExecutableMethod("requestFocus"))
+//            if (keepKeyboardOpenedOnConfigurationChanged) keyboardOpener.executeWhenDomIsLoaded(Unit)
+//        } else {
+//            keepKeyboardOpenedOnConfigurationChanged = false
+//        }
+//    }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
